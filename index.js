@@ -53,6 +53,9 @@ sqlite.connect(pathName + fileName);
  * @returns {Object|Boolean}
  */
 var getResults = function(bundleId) {
+
+    bundleId = bundleId.trim();
+
     if (!bundleId) {
         console.error('Error: Missing Bundle identifier');
         return false;
