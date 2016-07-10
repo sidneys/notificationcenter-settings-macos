@@ -123,7 +123,7 @@ npm run test
     
 ## <a name="under-the-hood"></a>Under the hood
 
-The module parses the default Sqlite3 database file for the **com.apple.notificationcente**.
+The module parses the default Sqlite3 .db database for **com.apple.notificationcenter**.
 The contained bit flags for each application identifier contain its current settings.
 
 
