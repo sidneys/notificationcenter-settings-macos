@@ -1,0 +1,39 @@
+{
+  "name": "notificationcenter-settings-macos",
+  "version": "1.0.0",
+  "description": "Exposes a streamlined interface to the settings for Apple OSX and Apple macOS applications.",
+  "license": "MIT",
+  "author": "Sidney Bofah <sidney.bofah@googlemail.com> (https://sidneys.github.io/)",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/sidneys/notificationcenter-settings-macos.git"
+  },
+  "bugs": {
+    "url": "https://github.com/sidneys/notificationcenter-settings-macos/issues"
+  },
+  "homepage": "http://sidneys.github.io/notificationcenter-settings-macos",
+  "keywords": [
+    "macOS",
+    "OSX",
+    "Notification Center",
+    "com.apple.notificationcenter"
+  ],
+  "main": "index.js",
+  "bin": {
+    "nc-settings": "./bin/nc-config.js"
+  },
+  "scripts": {
+    "test": "node ./node_modules/mocha/bin/mocha ./test/test.js"
+  },
+  "dependencies": {
+    "app-root-path": "^1.2.1",
+    "sqlite-sync": "^0.3.5"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "describe": "^1.2.0",
+    "expect": "^1.20.2",
+    "expect.js": "^0.3.1",
+    "mocha": "^2.5.3"
+  }
+}
