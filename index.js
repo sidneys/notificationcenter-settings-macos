@@ -1,25 +1,32 @@
 'use strict';
 
 
+
+/**
+ * @constant
+ * @default
+ */
+const _QUERY = 'SELECT * FROM app_info';
+
+
 /**
  * Modules (Node)
  */
-var fs = require('fs');
-var path = require('path');
-var childProcess = require('child_process');
+let fs = require('fs');
+let path = require('path');
+let childProcess = require('child_process');
 
 
 /**
  * Modules (External)
  */
-var sqlite = require('sqlite-sync');
-
-
+let dblite = require('dblite');
+let fkill = require('fkill');
 
 /**
  * Flags (Bits in a 16bit data structure)
  */
-var notificationFlags = {
+let notificationFlags = {
     isHidden: 1 << 0,             // Show in Notification Center
     showBadge: 1 << 1,            // Show badge app icon
     playSound: 1 << 2,            // Play sound for notifications
@@ -32,8 +39,9 @@ var notificationFlags = {
 
 /** Get NotificationCenter database file
  */
-var pathName = childProcess.spawnSync('/usr/bin/getconf', ['DARWIN_USER_DIR'], { encoding: 'utf8' }).stdout.replace(/(\r\n|\n|\r)/gm, ''),
-    fileName = path.join('com.apple.notificationcenter', 'db', 'db');
+let pathName = childProcess.spawnSync('/usr/bin/getconf', ['DARWIN_USER_DIR'], { encoding: 'utf8' }).stdout.replace(/(\r\n|\n|\r)/gm, ''),
+    fileName = path.join('com.apple.notificationcenter', 'db', 'db'),
+    db;
 
 // Check
 if (!fs.existsSync(pathName + fileName)) {
@@ -41,39 +49,63 @@ if (!fs.existsSync(pathName + fileName)) {
 }
 
 
-/**
- * Init SQLite DB
- */
-sqlite.connect(pathName + fileName);
+let killProcesses = function() {
+
+    fkill(['NotificationCenter', 'usernoted'], { force: true }).then((result) => {
+        console.log('Killed process', result);
+    }).catch(function(e) {
+        console.log(e); // "oh, no!"
+    });
+};
 
 
 /** Returns a settings object for passed OSX app bundle ids.
  *
- * @param {String} bundleId - OSX Application identifier
- * @returns {Object|Boolean}
+ * @param {String} bundleid - OSX Application identifier
+ * @param {String} cb - Callback
  */
-var getResults = function(bundleId) {
+let getResults = function(bundleid, cb) {
 
-    bundleId = bundleId.trim();
+    db = dblite(pathName + fileName);
 
-    if (!bundleId) {
+    let callback = cb || function() {};
+
+    if (!bundleid) {
         console.error('Error: Missing Bundle identifier');
         return false;
+    } else {
+        bundleid = bundleid.trim();
     }
 
-    var resultList = sqlite.run('SELECT flags from app_info where bundleid="' + bundleId + '"', null, null);
-    var resultFlags = resultList[0].flags;
-    var resultObject = {};
+    let resultObject = {},
+        resultFlags = 0;
 
-    if (resultList.length === 0) {
-        return console.log('Empty result');
-    }
+    // use the fields to parse back the object
+    db.query(_QUERY, { app_id: Number, bundleid: String, flags: String }, function(err, rows) {
 
-    for (var prop in notificationFlags) {
-        resultObject[prop] = Boolean(resultFlags & notificationFlags[prop]);
-    }
+        if (err) {
+            console.error('Error', err);
+            return false;
+        }
 
-    return resultObject;
+        resultFlags = (rows.filter(function(a) { return a.bundleid === bundleid; })[0]).flags || resultFlags;
+
+        for (let prop in notificationFlags) {
+            resultObject[prop] = Boolean(resultFlags & notificationFlags[prop]);
+        }
+
+        // Close DB
+        db.close();
+
+        // Restart Notification Center processes
+        killProcesses();
+
+        // Callback
+        callback(resultObject);
+
+        // Return
+        return resultObject;
+    });
 };
 
 
@@ -81,11 +113,12 @@ var getResults = function(bundleId) {
  * Initialize main process if called from CLI
  */
 if (require.main === module) {
-    var bundleId = process.argv.slice(2)[0];
-    var result = getResults(bundleId);
+    let bundleId = process.argv.slice(2)[0];
 
-    console.log('Notification Center settings for "' + bundleId + '":');
-    console.log(JSON.stringify(result, null, 4));
+    getResults(bundleId, function(result) {
+        console.log('Notification Center settings for "' + bundleId + '":');
+        console.log(JSON.stringify(result, null, 4));
+    });
 }
 
 
