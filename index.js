@@ -37,15 +37,26 @@ let notificationFlags = {
     hidePreview: 1 << 14          // Hide message preview
 };
 
-/** Get NotificationCenter database file
- */
-let pathName = childProcess.spawnSync('/usr/bin/getconf', ['DARWIN_USER_DIR'], { encoding: 'utf8' }).stdout.replace(/(\r\n|\n|\r)/gm, ''),
-    fileName = path.join('com.apple.notificationcenter', 'db', 'db'),
+
+let resultFiltered,
+    resultObject = {},
+    resultFlags = 0,
     db;
 
+
+/** Get NotificationCenter sqlite database file
+ */
+let getPath = function() {
+    let pathName = childProcess.spawnSync('/usr/bin/getconf', ['DARWIN_USER_DIR'], { encoding: 'utf8' }).stdout.replace(/(\r\n|\n|\r)/gm, ''),
+        fileName = path.join('com.apple.notificationcenter', 'db', 'db');
+
+    return pathName + fileName;
+};
+
+
 // Check
-if (!fs.existsSync(pathName + fileName)) {
-    return console.error('Error: com.apple.notificationcenter database not found at: ' + pathName + fileName);
+if (!fs.existsSync(getPath())) {
+    return console.error('Error: com.apple.notificationcenter database not found at: ' + getPath());
 }
 
 
@@ -59,52 +70,52 @@ let killProcesses = function() {
 };
 
 
-/** Returns a settings object for passed OSX app bundle ids.
+/** Returns with a callback holding the global settings object for passed OSX app bundle ids.
  *
  * @param {String} bundleid - OSX Application identifier
- * @param {String} cb - Callback
+ * @param {Function} cb - Callback
  */
-let getResults = function(bundleid, cb) {
+let getSettings = function(bundleid, cb) {
 
-    db = dblite(pathName + fileName);
+    let self = this;
+
+    db = dblite(getPath());
 
     let callback = cb || function() {};
 
     if (!bundleid) {
-        console.error('Error: Missing Bundle identifier');
-        return false;
+        //console.error('Error: Missing Bundle identifier');
+        return callback(new Error('Error: Missing Bundle identifier'));
     } else {
         bundleid = bundleid.trim();
     }
-
-    let resultObject = {},
-        resultFlags = 0;
 
     // use the fields to parse back the object
     db.query(_QUERY, { app_id: Number, bundleid: String, flags: String }, function(err, rows) {
 
         if (err) {
             console.error('Error', err);
-            return false;
+            return callback(err);
         }
 
-        resultFlags = (rows.filter(function(a) { return a.bundleid === bundleid; })[0]).flags || resultFlags;
+        resultFiltered = rows.filter(function(a) { return a.bundleid === bundleid; }, self)[0];
+        resultFlags = resultFiltered.flags || resultFlags;
 
         for (let prop in notificationFlags) {
             resultObject[prop] = Boolean(resultFlags & notificationFlags[prop]);
         }
+
+        //console.log('resultFlags', resultFlags, 'resultFiltered', resultFiltered);
+        //console.dir(resultObject)
+
+        // Callback OK
+        callback(null, resultObject);
 
         // Close DB
         db.close();
 
         // Restart Notification Center processes
         killProcesses();
-
-        // Callback
-        callback(resultObject);
-
-        // Return
-        return resultObject;
     });
 };
 
@@ -115,7 +126,10 @@ let getResults = function(bundleid, cb) {
 if (require.main === module) {
     let bundleId = process.argv.slice(2)[0];
 
-    getResults(bundleId, function(result) {
+    getSettings(bundleId, function(err, result) {
+        if (err) {
+            return err;
+        }
         console.log('Notification Center settings for "' + bundleId + '":');
         console.log(JSON.stringify(result, null, 4));
     });
@@ -125,4 +139,7 @@ if (require.main === module) {
 /**
  * exports
  */
-module.exports = exports = getResults;
+module.exports = exports = {
+    get: getSettings,
+    path: getPath
+};

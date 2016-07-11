@@ -26,23 +26,27 @@
  
 ## <a name="programmatic-usage"></a>Programmatic Usage
 
-Install the module:
+Install it
 
 ```bash
 $ npm install --save notificationcenter-settings
 ```
 
-Require it and passing it a bundle id:
+Require it
 
 ```js
-var ncSettings = require('notificationcenter-settings')('com.apple.iTunes');
+var ncSettings = require('notificationcenter-settings');
 ```
 
+Use the **get()** callback to parse settings:
+
+```js
+ncSettings.get('com.apple.iTunes', function(err, result) {
+	if (err) return err;
+	console.dir(result);
+};
+```
 Result:
-
-```js
-console.dir(ncSettings);
-```
 
 ```
 {
@@ -91,19 +95,15 @@ Notification Center settings for "com.apple.iTunes":
 
 ## <a name="api"></a>API
 
+### `get(bundleId, callback)`
 
-### Parameters
-The module exposes itself as a function and takes a single *String* parameter.
+Get current Notification Center settings for app using bundleId.
 
-- *bundleIdentifier* (String)  
-**macOS application bundle identifier (e.g., 'com.apple.iTunes')**
+ - **String *bundleId* - Bundle identifier for the callback function**
+ - **Function *callback* - The function to call to start Notification Center parsing**
 
-See also ['Getting the bundle identifier of an OS X application in a shell script'](http://superuser.com/questions/346369/getting-the-bundle-identifier-of-an-os-x-application-in-a-shell-script)
-
-
-### Result
-
-The result has the following properties.
+**Returns:**  
+ - *Object* with the following properties:
 
  - isHidden  **Show in Notification center**
  - showBadge  **Show badge app icon**
@@ -113,12 +113,21 @@ The result has the following properties.
  - hideInLockscreen  **Hide notifications on lock screen**
  - showPreview  **Show message preview**
  - hidePreview  **Hide message preview**
+ 
 
+### `path()`
+
+Get absolute path to Notification Center database file.  
+
+*See also ['Getting the bundle identifier of an OS X application in a shell script'](http://superuser.com/questions/346369/getting-the-bundle-identifier-of-an-os-x-application-in-a-shell-script)*
+
+**Returns:**  
+* *String* containing the absolute path to the database file
 
 ## <a name="tests"></a>Tests
 
 ```bash
-npm run test
+npm test
 ```
     
 ## <a name="under-the-hood"></a>Under the hood

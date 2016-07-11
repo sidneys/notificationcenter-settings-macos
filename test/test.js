@@ -1,61 +1,46 @@
 'use strict';
 
 
-var expect = require('chai').expect,
-    appRoot = require('app-root-path').path;
+var chai = require('chai'),
+    expect = chai.expect,
+    appRoot = require('app-root-path').path,
+    ncSettings = require(appRoot);
 
-var ncSettings = require(appRoot);
 
+/**
+ * Flags (Bits in a 16bit data structure)
+ */
+let defaultSettings = {
+    isHidden: false,
+    showBadge: true,
+    playSound: true,
+    isBanner: true,
+    isAlert: false,
+    hideInLockscreen: false,
+    showPreview: true,
+    hidePreview: false
+};
 
-describe('Valid Bundle Identifier ("com.apple.iTunes")', function() {
-    var settings = ncSettings('com.apple.iTunes');
-
-    it('should return an object', function() {
-        expect(settings).to.be.an('object');
-    });
-
-    it('isHidden should return an boolean', function() {
-        expect(settings).to.have.property('isHidden').that.is.an('boolean');
-    });
-
-    it('showBadge should return an boolean', function() {
-        expect(settings).to.have.property('showBadge').that.is.an('boolean');
-    });
-
-    it('playSound should return an boolean', function() {
-        expect(settings).to.have.property('playSound').that.is.an('boolean');
-    });
-
-    it('isBanner should return an boolean', function() {
-        expect(settings).to.have.property('isBanner').that.is.an('boolean');
-    });
-
-    it('isAlert should return an boolean', function() {
-        expect(settings).to.have.property('isAlert').that.is.an('boolean');
-    });
-
-    it('hideInLockscreen should return an boolean', function() {
-        expect(settings).to.have.property('hideInLockscreen').that.is.an('boolean');
-    });
-
-    it('showPreview should return an boolean', function() {
-        expect(settings).to.have.property('showPreview').that.is.an('boolean');
-    });
-
-    it('hidePreview should return an boolean', function() {
-        expect(settings).to.have.property('hidePreview').that.is.an('boolean');
+describe('ncSettings.get("com.apple.iTunes")', function() {
+    it('validate settings object', function(done) {
+        ncSettings.get('com.apple.iTunes', function(err, settings) {
+            expect(settings).to.have.all.keys(defaultSettings);
+            done();
+        });
     });
 });
 
-
-describe('Invalid Bundle Identifier ("")', function() {
-    var settings = ncSettings('');
-
-    it('should return a boolean', function() {
-        expect(settings).to.be.a('boolean');
+describe('ncSettings.get("")', function() {
+    it('respond with error', function(done) {
+        ncSettings.get('', function(err, settings) {
+            expect(err).to.be.an('error');
+            done();
+        });
     });
+});
 
-    it('should return false', function() {
-        expect(settings).to.equal(false);
+describe('ncSettings.path()', function() {
+    it('respond with path', function() {
+        expect(ncSettings.path()).to.be.an('string');
     });
 });
