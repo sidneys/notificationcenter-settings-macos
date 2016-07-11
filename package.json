@@ -1,37 +1,40 @@
 {
-    "name": "notificationcenter-settings-macos",
-    "version": "2.1.0",
-    "description": "Exposes a streamlined interface to the settings for Apple OSX and Apple macOS applications.",
-    "license": "MIT",
-    "author": "Sidney Bofah <sidney.bofah@googlemail.com> (https://sidneys.github.io/)",
-    "repository": {
-        "type": "git",
-        "url": "git://github.com/sidneys/notificationcenter-settings-macos.git"
-    },
-    "bugs": {
-        "url": "https://github.com/sidneys/notificationcenter-settings-macos/issues"
-    },
-    "homepage": "http://sidneys.github.io/notificationcenter-settings-macos",
-    "keywords": [
-        "macOS", "OSX", "Notification Center", "com.apple.notificationcenter"
-    ],
-    "engines": {
-        "node": ">=6.0.0"
-    },
-    "main": "./index.js",
-    "bin": {
-        "nc-settings": "./bin/nc-config.js"
-    },
-    "scripts": {
-        "test": "./node_modules/.bin/mocha --reporter spec"
-    },
-    "dependencies": {
-        "app-root-path": "^1.2.1",
-        "dblite": "^0.7.7",
-        "fkill": "^4.0.0"
-    },
-    "devDependencies": {
-        "chai": "^3.5.0",
-        "mocha": "^2.5.3"
-    }
+  "name": "notificationcenter-settings-macos",
+  "version": "2.1.1",
+  "description": "Exposes a streamlined interface to the settings for Apple OSX and Apple macOS applications.",
+  "license": "MIT",
+  "author": "Sidney Bofah <sidney.bofah@googlemail.com> (https://sidneys.github.io/)",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/sidneys/notificationcenter-settings-macos.git"
+  },
+  "bugs": {
+    "url": "https://github.com/sidneys/notificationcenter-settings-macos/issues"
+  },
+  "homepage": "http://sidneys.github.io/notificationcenter-settings-macos",
+  "keywords": [
+    "macOS",
+    "OSX",
+    "Notification Center",
+    "com.apple.notificationcenter"
+  ],
+  "engines": {
+    "node": ">=6.0.0"
+  },
+  "main": "./index.js",
+  "bin": {
+    "nc-settings": "./bin/nc-config.js"
+  },
+  "scripts": {
+    "test": "./node_modules/.bin/mocha --reporter spec"
+  },
+  "dependencies": {
+    "app-root-path": "^1.2.1",
+    "dblite": "^0.7.7",
+    "fkill": "^4.0.0"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^2.5.3"
+  }
 }
