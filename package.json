@@ -18,7 +18,10 @@
     "Notification Center",
     "com.apple.notificationcenter"
   ],
-  "main": "index.js",
+  "engines": {
+    "node": ">=6.0.0"
+  },
+  "main": "./index.js",
   "bin": {
     "nc-settings": "./bin/nc-config.js"
   },
@@ -27,7 +30,8 @@
   },
   "dependencies": {
     "app-root-path": "^1.2.1",
-    "sqlite-sync": "^0.3.5"
+    "dblite": "^0.7.7",
+    "fkill": "^4.0.0"
   },
   "devDependencies": {
     "chai": "^3.5.0",
