@@ -31,7 +31,8 @@
   "dependencies": {
     "app-root-path": "^1.2.1",
     "dblite": "^0.7.7",
-    "fkill": "^4.0.0"
+    "fkill": "^4.0.0",
+    "require-rebuild": "^1.2.8"
   },
   "devDependencies": {
     "chai": "^3.5.0",

@@ -1,6 +1,10 @@
 'use strict';
 
 
+/** Rebuild native modules against Electron's NodeJS
+ */
+require('require-rebuild')();
+
 
 /**
  * @constant
