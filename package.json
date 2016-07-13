@@ -1,6 +1,6 @@
 {
   "name": "notificationcenter-settings-macos",
-  "version": "2.1.1",
+  "version": "2.2.0",
   "description": "Exposes a streamlined interface to the settings for Apple OSX and Apple macOS applications.",
   "license": "MIT",
   "author": "Sidney Bofah <sidney.bofah@googlemail.com> (https://sidneys.github.io/)",
@@ -17,6 +17,9 @@
     "OSX",
     "Notification Center",
     "com.apple.notificationcenter"
+  ],
+  "os": [
+    "darwin"
   ],
   "engines": {
     "node": ">=6.0.0"
@@ -35,6 +38,10 @@
     "require-rebuild": "^1.2.8"
   },
   "devDependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^2.5.3"
+  },
+  "optionalDependencies": {
     "chai": "^3.5.0",
     "mocha": "^2.5.3"
   }
