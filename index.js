@@ -102,8 +102,8 @@ let getSettings = function(bundleid, cb) {
             return callback(err);
         }
 
-        resultFiltered = rows.filter(function(a) { return a.bundleid === bundleid; }, self)[0];
-        resultFlags = resultFiltered.flags || resultFlags;
+        resultFiltered = rows.filter(function(a) { return a['bundleid'] === bundleid; }, self)[0];
+        resultFlags = resultFiltered['flags'] || resultFlags;
 
         for (let prop in notificationFlags) {
             resultObject[prop] = Boolean(resultFlags & notificationFlags[prop]);
