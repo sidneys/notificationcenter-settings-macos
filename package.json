@@ -1,6 +1,6 @@
 {
   "name": "notificationcenter-settings-macos",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "description": "Exposes a streamlined interface to the settings for Apple OSX and Apple macOS applications.",
   "license": "MIT",
   "author": "Sidney Bofah <sidney.bofah@googlemail.com> (https://sidneys.github.io/)",
