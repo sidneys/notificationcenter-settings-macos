@@ -10,7 +10,17 @@ require('require-rebuild')();
  * @constant
  * @default
  */
-const _QUERY = 'SELECT * FROM app_info';
+const _QUERY = 'SELECT * FROM app_info',
+    _FLAGS = {
+        isHidden: 1 << 0,             // Show in Notification Center
+        showBadge: 1 << 1,            // Show badge app icon
+        playSound: 1 << 2,            // Play sound for notifications
+        isBanner: 1 << 3,             // Show as banner
+        isAlert: 1 << 4,              // Show as Alert
+        hideInLockscreen: 1 << 12,    // Hide notifications on lock screen
+        showPreview: 1 << 13,         // Show message preview
+        hidePreview: 1 << 14          // Hide message preview
+    };
 
 
 /**
@@ -27,24 +37,11 @@ let childProcess = require('child_process');
 let dblite = require('dblite');
 let fkill = require('fkill');
 
-/**
- * Flags (Bits in a 16bit data structure)
- */
-let notificationFlags = {
-    isHidden: 1 << 0,             // Show in Notification Center
-    showBadge: 1 << 1,            // Show badge app icon
-    playSound: 1 << 2,            // Play sound for notifications
-    isBanner: 1 << 3,             // Show as banner
-    isAlert: 1 << 4,              // Show as Alert
-    hideInLockscreen: 1 << 12,    // Hide notifications on lock screen
-    showPreview: 1 << 13,         // Show message preview
-    hidePreview: 1 << 14          // Hide message preview
-};
 
-
-let resultFiltered,
-    resultObject = {},
+let resultList,
     resultFlags = 0,
+    resultObject = {},
+    settingsObject = {},
     db;
 
 
@@ -88,8 +85,7 @@ let getSettings = function(bundleid, cb) {
     let callback = cb || function() {};
 
     if (!bundleid) {
-        //console.error('Error: Missing Bundle identifier');
-        return callback(new Error('Error: Missing Bundle identifier'));
+        return callback(new Error('Missing app bundle id.'));
     } else {
         bundleid = bundleid.trim();
     }
@@ -98,22 +94,27 @@ let getSettings = function(bundleid, cb) {
     db.query(_QUERY, { app_id: Number, bundleid: String, flags: String }, function(err, rows) {
 
         if (err) {
-            console.error('Error', err);
             return callback(err);
         }
 
-        resultFiltered = rows.filter(function(a) { return a['bundleid'] === bundleid; }, self)[0];
-        resultFlags = resultFiltered['flags'] || resultFlags;
-
-        for (let prop in notificationFlags) {
-            resultObject[prop] = Boolean(resultFlags & notificationFlags[prop]);
+        resultList = rows.filter(function(a) {
+            return a['bundleid'] === bundleid;
+        }, self);
+        
+        resultObject = resultList[0];
+        
+        if (resultObject === null || typeof resultObject !== 'object' || !(resultObject['flags'])) {
+            return callback(new Error('No notification settings found for "' + bundleid + '".'));
         }
 
-        //console.log('resultFlags', resultFlags, 'resultFiltered', resultFiltered);
-        //console.dir(resultObject)
+        resultFlags = resultObject['flags'];
 
-        // Callback OK
-        callback(null, resultObject);
+        for (let prop in _FLAGS) {
+            settingsObject[prop] = Boolean(resultFlags & _FLAGS[prop]);
+        }
+
+        // Callback
+        callback(null, settingsObject);
 
         // Close DB
         db.close();

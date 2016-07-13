@@ -21,17 +21,8 @@ let defaultSettings = {
     hidePreview: false
 };
 
-describe('ncSettings.get("com.apple.iTunes")', function() {
-    it('validate settings object', function(done) {
-        ncSettings.get('com.apple.iTunes', function(err, settings) {
-            expect(settings).to.have.all.keys(defaultSettings);
-            done();
-        });
-    });
-});
-
 describe('ncSettings.get("")', function() {
-    it('respond with error', function(done) {
+    it('Responds with error for missing "bundle id" parameter', function(done) {
         ncSettings.get('', function(err, settings) {
             expect(err).to.be.an('error');
             done();
@@ -39,8 +30,26 @@ describe('ncSettings.get("")', function() {
     });
 });
 
+describe('ncSettings.get("com.apple.iTunes")', function() {
+    it('Validates settings for installed app registered within Notification Center', function(done) {
+        ncSettings.get('com.apple.iTunes', function(err, settings) {
+            expect(settings).to.have.all.keys(defaultSettings);
+            done();
+        });
+    });
+});
+
+describe('ncSettings.get("com.apple.Terminal")', function() {
+    it('Responds with error for installed app not registered within Notification Center', function(done) {
+        ncSettings.get('com.apple.Terminal', function(err, settings) {
+            expect(err).to.be.an('error');
+            done();
+        });
+    });
+});
+
 describe('ncSettings.path()', function() {
-    it('respond with path', function() {
+    it('Responds with absolute filepath to Notification Center database', function() {
         expect(ncSettings.path()).to.be.an('string');
     });
 });
